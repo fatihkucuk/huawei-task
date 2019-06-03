@@ -1,0 +1,56 @@
+<div class="container">
+  <div class="row">
+    <div class="col-md-12">
+      <h3 class="text-center" style="padding: 10px">Welcome to my HUAWEI task</h3>
+      <p>
+        <b>Author:</b> Fatih Küçük
+      </p>
+      <p>
+        <b>Email:</b> 1fatihkucuk@gmail.com
+      </p>
+      <p>
+        <b>Phone:</b> +90 534 877 47 37
+      </p>
+    </div>
+  </div>
+</div>
+<div class="container bg-white">
+  <div class="row">
+    <div class="col-md-12">
+      <div class="form-group">
+        <h4 style="padding: 10px 0">
+          <ng-template [ngIf]="pageMode == 1">
+            Login
+          </ng-template>
+          <ng-template [ngIf]="pageMode == 2">
+            Signup
+          </ng-template>
+        </h4>
+      </div>
+      <div class="form-group">
+        <ng-template [ngIf]="pageMode == 2">
+          <label>Name</label>
+          <input type="text" class="form-control" [(ngModel)]="user.name" placeholder="Name">
+        </ng-template>
+      </div>
+      <div class="form-group">
+        <label>User Name</label>
+        <input type="text" class="form-control" [(ngModel)]="user.userName" placeholder="Email">
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="text" class="form-control" [(ngModel)]="user.password" placeholder="Password">
+      </div>
+      <div class="form-group">
+        <ng-template [ngIf]="pageMode == 1">
+          <a (click)="changePageMode(2)">Create an account</a>
+          <button class="btn btn-primary pull-right" (click)="loginButtonClicked()">Login</button>
+        </ng-template>
+        <ng-template [ngIf]="pageMode == 2">
+          Already have an account <a (click)="changePageMode(1)">Login</a>
+          <button class="btn btn-primary pull-right" (click)="signupButtonClicked()">Signup</button>
+        </ng-template>
+      </div>
+    </div>
+  </div>
+</div>

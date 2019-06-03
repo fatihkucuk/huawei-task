@@ -1,0 +1,17 @@
+<nav id="navbar-example2" class="navbar navbar-light bg-light">
+  <a class="navbar-brand" href="#">Huawei Task</a>
+  <ul class="nav nav-pills">
+    <div class="dropdown">
+      <button class="btn btn-basic dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown"
+        aria-haspopup="true" aria-expanded="false">
+        {{user.userName}}
+      </button>
+      <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+        <a class="dropdown-item" [routerLink]="'/login'" (click)="logoutButtonClicked()">Logout</a>
+        <a class="dropdown-item" href="#">Change Password</a>
+        <div class="dropdown-item" href="#">
+          <input type="text" class="form-control"></div>
+      </div>
+    </div>
+  </ul>
+</nav>

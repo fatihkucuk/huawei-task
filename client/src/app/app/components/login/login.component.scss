@@ -1,0 +1,23 @@
+.container {
+  background-color: #fff;
+  width: 40%;
+  margin-top: 30px;
+  padding: 25px;
+}
+
+a {
+  cursor: pointer;
+  color: blue !important;
+}
+
+a:hover {
+  text-decoration: underline !important;
+}
+
+p {
+  word-break: break-word;
+}
+
+h3 {
+  word-break: break-word;
+}

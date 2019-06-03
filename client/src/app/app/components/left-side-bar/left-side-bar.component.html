@@ -1,0 +1,14 @@
+<nav id="sidebar">
+  <ul class="list-unstyled components">
+    <li (click)="itemClicked('task')" [ngClass]="{'active': pageMode == 3}">
+      <a>
+        <span>
+          <i class="fa fa-tasks" style="font-size: 24px"></i>
+        </span>
+        <span>
+          To Do Lists
+        </span>
+      </a>
+    </li>
+  </ul>
+</nav>

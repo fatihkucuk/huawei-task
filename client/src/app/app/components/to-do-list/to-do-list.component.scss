@@ -1,0 +1,37 @@
+.table-wrapper {
+  background-color: #fff;
+}
+
+.nav-pills .nav-link.active,
+.nav-pills .show > .nav-link {
+  color: #fff;
+  background-color: #37d8d8;
+}
+.container {
+  margin-top: 90px;
+  background-color: #fff;
+  padding: 10px;
+}
+.dropdown-toggle::after {
+  display: inline-block;
+  margin-left: 0 !important;
+  vertical-align: 0.255em;
+  content: "" !important;
+  border-top: 0 solid !important;
+  border-right: 0 solid transparent !important;
+  border-bottom: 0 !important;
+  border-left: 0 solid transparent !important;
+}
+
+.dropdown {
+  display: inline-block;
+  margin-left: 5px;
+}
+
+.dropdown-item:hover {
+  background-color: transparent !important;
+}
+
+.dropdown-item:active {
+  background-color: transparent !important;
+}
