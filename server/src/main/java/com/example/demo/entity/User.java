@@ -1,9 +1,7 @@
 package com.example.demo.entity;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
+import java.util.List;
 
 @Entity()
 @Table(name = "user", schema = "public")
@@ -12,7 +10,6 @@ public class User {
     public User() {
         super();
     }
-
 
     public Integer getId() {
         return id;
@@ -55,11 +52,23 @@ public class User {
     }
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy=GenerationType.IDENTITY)
+    @Column(name="id")
     private int id;
+
+    @Column(name="name")
     private String name;
+
+    @Column(name="username")
     private String username;
+
+    @Column(name="password")
     private String password;
+
+    @Column(name="token")
     private String token;
+
+    @Transient
+    private List<TodoGroup> todoGroups;
 
 }
