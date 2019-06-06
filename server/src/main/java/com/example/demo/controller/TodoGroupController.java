@@ -10,9 +10,10 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @RestController
-
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 public class TodoGroupController {
 
     @Autowired
@@ -21,26 +22,30 @@ public class TodoGroupController {
     @Autowired
     TodoService todoService;
 
-    @RequestMapping(value="/todo-groups/list", method = RequestMethod.GET)
-    public ResponseModel<TodoGroup> getAllTodoGroups(){
+    @RequestMapping(value="/todo-groups/list", method = RequestMethod.POST)
+    public ResponseModel<TodoGroup> getAllTodoGroups(@RequestBody Map<String, Integer> body){
         ResponseModel response = new ResponseModel<TodoGroup>();
         List<TodoGroup> todoGroupsToReturn = new ArrayList<TodoGroup>();
+        int userID = body.get("user_id");
         try {
             List<TodoGroup> todoGroups = todoGroupService.getAllTodoGroups();
             List<Todo> todos = todoService.getAllTodos();
 
             for (TodoGroup todoGroup : todoGroups)
             {
-                List<Todo> todoList = todoGroup.getTodos();
-                for (Todo todo : todos)
+                if (todoGroup.getUser_id() == userID)
                 {
-                    if(todo.getGroup_id() == todoGroup.getId()){
-                        if(todoList == null){
-                            todoList = new ArrayList<Todo>();
+                    for (Todo todo : todos)
+                    {
+                        if(todo.getGroup_id() == todoGroup.getId()){
+                            if(todoGroup.getTodos() == null){
+                                todoGroup.setTodos(new ArrayList<Todo>());
+                            }
+                            todoGroup.getTodos().add(todo);
                         }
                     }
+                    todoGroupsToReturn.add(todoGroup);
                 }
-                todoGroup.setTodos(todoList);
             }
             response.setEntities(todoGroupsToReturn);
             return response;
@@ -53,7 +58,7 @@ public class TodoGroupController {
     }
 
     @RequestMapping(value="/todo-groups/{id}", method = RequestMethod.GET)
-    public ResponseModel<TodoGroup> getTodoById(@PathVariable("id") int id){
+    public ResponseModel<TodoGroup> getTodoGroupById(@PathVariable("id") int id){
         ResponseModel response = new ResponseModel<TodoGroup>();
         try {
             TodoGroup todoGroup = todoGroupService.getTodoGroupById(id);
@@ -68,7 +73,7 @@ public class TodoGroupController {
     }
 
     @RequestMapping(value="/todo-groups/insert", method = RequestMethod.POST)
-    public ResponseModel<TodoGroup> insertTodo(@RequestBody TodoGroup todoGroup){
+    public ResponseModel<TodoGroup> insertTodoGroup(@RequestBody TodoGroup todoGroup){
         ResponseModel response = new ResponseModel<TodoGroup>();
         try {
             todoGroup = todoGroupService.insertTodoGroup(todoGroup);
@@ -82,8 +87,8 @@ public class TodoGroupController {
         }
     }
 
-    @RequestMapping(value="/todo-groups/update/{id}", method = RequestMethod.PUT)
-    public ResponseModel<TodoGroup> updateTodo(@RequestBody TodoGroup todoGroup, @PathVariable("id") int id){
+    @RequestMapping(value="/todo-groups/update", method = RequestMethod.PUT)
+    public ResponseModel<TodoGroup> updateTodoGroup(@RequestBody TodoGroup todoGroup){
         ResponseModel response = new ResponseModel<TodoGroup>();
         try {
             todoGroup = todoGroupService.updateTodoGroup(todoGroup);

@@ -10,8 +10,10 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 public class TodoController {
     @Autowired
+            
     TodoService todoService;
     @RequestMapping(value="/todos/list", method = RequestMethod.GET)
     public ResponseModel<Todo> getAllTodos(){

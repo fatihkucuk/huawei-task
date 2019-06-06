@@ -5,13 +5,14 @@ import org.hibernate.validator.constraints.SafeHtml;
 import javax.persistence.*;
 import java.util.List;
 
-@Entity()
+@Entity(name="todo_group")
 @Table(name = "todo_group", schema = "public")
+@SecondaryTable(name="user", schema = "public")
 public class TodoGroup{
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
     @Column(name="id")
-    private Integer id;
+    private int id;
 
     public int getId() {
         return id;
@@ -49,7 +50,7 @@ public class TodoGroup{
     private String name;
 
     @Column(name="user_id")
-    private Integer user_id;
+    private int user_id;
 
     @Transient
     private User user;

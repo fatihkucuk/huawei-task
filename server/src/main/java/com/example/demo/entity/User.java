@@ -5,6 +5,7 @@ import java.util.List;
 
 @Entity()
 @Table(name = "user", schema = "public")
+@SecondaryTable(name="todo_group", schema = "public")
 public class User {
 
     public User() {
@@ -51,6 +52,14 @@ public class User {
         this.token = token;
     }
 
+    public List<TodoGroup> getTodoGroups() {
+        return todoGroups;
+    }
+
+    public void setTodoGroups(List<TodoGroup> todoGroups) {
+        this.todoGroups = todoGroups;
+    }
+
     @Id
     @GeneratedValue(strategy=GenerationType.IDENTITY)
     @Column(name="id")
@@ -69,6 +78,7 @@ public class User {
     private String token;
 
     @Transient
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<TodoGroup> todoGroups;
 
 }

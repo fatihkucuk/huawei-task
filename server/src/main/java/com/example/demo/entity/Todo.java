@@ -1,5 +1,7 @@
 package com.example.demo.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 import java.util.Date;
 
@@ -13,6 +15,14 @@ public class Todo {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getDescription() {
@@ -59,7 +69,7 @@ public class Todo {
         return dependent_id;
     }
 
-    public void setDependent_id(int dependent_id) {
+    public void setDependent_id(Integer dependent_id) {
         this.dependent_id = dependent_id;
     }
 
@@ -76,6 +86,9 @@ public class Todo {
     @Column(name="id")
     private int id;
 
+    @Column(name="name")
+    private String name;
+
     @Column(name="description")
     private String description;
 
@@ -91,8 +104,9 @@ public class Todo {
     @Transient
     private TodoGroup group;
 
-    @Column(name="dependent_id")
-    private int dependent_id;
+    @JsonIgnore
+    @Column(name="dependent_id", nullable = true)
+    private Integer dependent_id;
 
     @Transient
     private Todo dependent;
