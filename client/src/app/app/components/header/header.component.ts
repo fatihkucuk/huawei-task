@@ -12,7 +12,7 @@ export class HeaderComponent implements OnInit {
   constructor() { }
 
   ngOnInit() {
-    this.user.userName = LocalStorageHandler.getUserName();
+    this.user.username = LocalStorageHandler.getUserName();
   }
 
   logoutButtonClicked() {

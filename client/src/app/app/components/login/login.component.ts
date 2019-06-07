@@ -9,7 +9,8 @@ import { LocalStorageHandler } from '../../helpers/local-storage-handler';
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
-  styleUrls: ['./login.component.scss']
+  styleUrls: ['./login.component.scss'],
+  providers: [UserRepository]
 })
 
 export class LoginComponent extends BaseComponent implements OnInit {
@@ -31,14 +32,16 @@ export class LoginComponent extends BaseComponent implements OnInit {
     this.userRepo
       .login(this.user)
       .then(res => {
-        if (res.hasError()) {
+        if (res.hasError) {
           this.hasError = true;
           this.errorMessage = res.getFirstErrorMessage();
           this.stopProgress();
         } else {
           this.user = res.entity;
-          LocalStorageHandler.setUser(this.user);
-          this.router.navigateByUrl('dashboard/list');
+          if (this.user) {
+            LocalStorageHandler.setUser(this.user);
+            this.router.navigateByUrl('dashboard/list');
+          }
           this.stopProgress();
         }
       })
@@ -50,7 +53,7 @@ export class LoginComponent extends BaseComponent implements OnInit {
   }
 
   signupButtonClicked() {
-    if (!this.user.userName) {
+    if (!this.user.username) {
       this.errorMessage = "Kullanıcı adı boş bırakılamaz.";
       return;
     }
@@ -70,7 +73,7 @@ export class LoginComponent extends BaseComponent implements OnInit {
     this.userRepo
       .signup(this.user)
       .then(res => {
-        if (res.hasError()) {
+        if (res.hasError) {
           this.hasError = true;
           this.errorMessage = res.getFirstErrorMessage();
           this.stopProgress();

@@ -13,12 +13,12 @@ export class UserRepository extends BaseRepository<UserModel> {
     constructor(public http: HttpClient) { super(UserModel, http, 'users') }
 
     login(user: UserModel) {
-        var data = { user: user }
+        var data = user.postDataRepresentation();
         return this.genericPost('users/login', data);
     }
 
     signup(user: UserModel) {
-        var data = { user: user }
+        var data = user.postDataRepresentation();
         return this.genericPost('users/signup', data);
     }
 }

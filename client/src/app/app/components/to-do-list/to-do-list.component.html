@@ -3,8 +3,8 @@
     <div class="col-md-12">
       <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
         <li *ngFor="let todoGroup of todoGroups; let j=index" class="nav-item" [ngClass]="{'active': j == 0}">
-          <a class="nav-link" id="pills-home-tab" data-toggle="pill" href="#pills-home" role="tab"
-            aria-controls="pills-home" aria-selected="true" (click)="selectedTabChanged(todoGroup)"
+          <a class="nav-link" [ngClass]="{'active': j == 0}" id="pills-home-tab" data-toggle="pill" href="#pills-home"
+            role="tab" aria-controls="pills-home" aria-selected="true" (click)="selectedTabChanged(todoGroup)"
             style="cursor: pointer">{{todoGroup.name}}</a>
         </li>
         <li style="position: absolute; right: 13px; top: 8px;">
@@ -24,13 +24,15 @@
           </div>
 
           <div class="dropdown">
-            <button class="btn btn-primary btn-circle btn-sm dropdown-toggle" type="button" id="dropdownMenuButton"
-              data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-              <i class="fa fa-pencil"></i>
-            </button>
+            <ng-template [ngIf]="activeTodoGroup">
+              <button class="btn btn-primary btn-circle btn-sm dropdown-toggle" type="button" id="dropdownMenuButton"
+                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <i class="fa fa-pencil"></i>
+              </button>
+            </ng-template>
             <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
               <div class="dropdown-item" href="#">
-                <input type="text" class="form-control" placeholder="name" [ngModel]="activeTodoGroup.name"
+                <input type="text" class="form-control" placeholder="name" [ngModel]="activeTodoGroup?.name"
                   (ngModelChange)="groupNameChange($event)">
               </div>
               <div class="dropdown-item" href="#">
@@ -49,73 +51,113 @@
       </ul>
       <ng-template [ngIf]="activeTodoGroup">
         <hr>
+        <div class="container" style="margin-top: 0 !important">
+          <div class="row">
+            <div class="col-md-4">
+              <input type="text" class="form-control" placeholder="name filter" [(ngModel)]="nameFilter"
+                (ngModelChange)="filterChanged($event, statusFilter)">
+            </div>
+            <div class="col-md-4">
+              <select class="form-control" [(ngModel)]="statusFilter"
+                (ngModelChange)="filterChanged(nameFilter, $event)">
+                <option [value]="undefined" selected>Select</option>
+                <option [value]="1">Not Completed</option>
+                <option [value]="2">Expired</option>
+                <option [value]="3">Completed</option>
+
+              </select>
+            </div>
+          </div>
+        </div>
       </ng-template>
       <div class="tab-content" id="pills-tabContent">
-        <div class="tab-pane fade show" ngClass="{'active': activeTodoGroup.id == todoGroup.id}" id="pills-home"
-          role="tabpanel" aria-labelledby="pills-home-tab">
-
+        <div class="tab-pane fade show" ngClass="{'active active in': activeTodoGroup.id == todoGroup.id}"
+          id="pills-home" role="tabpanel" aria-labelledby="pills-home-tab">
           <div class="container" style="margin-top: 10px !important">
             <div class="row">
               <div class="col-md-12" style="background-color: #fff; ">
                 <table class="table">
                   <tbody>
-                    <ng-template [ngIf]="!activeTodoGroup?.todos || activeTodoGroup?.todos?.length == 0">
+                    <ng-template [ngIf]="!todoGroups || todoGroups.length == 0">
                       <tr>
-                        <td colspan="3" style="text-align: center">There is no todo</td>
+                        <td colspan="4" style="text-align: center">There is no to do list</td>
                       </tr>
                     </ng-template>
-                    <ng-template [ngIf]="activeTodoGroup?.todos?.length > 0">
-                      <tr *ngFor="let todo of activeTodoGroup?.todos; let i=index">
-                        <td>
-                          <ng-template [ngIf]="todo.id && todoModel.id != todo.id">
-                            <h4>{{ todo.name }}</h4>
-                            <p>{{ todo.description }}</p>
-                            <p>Deadline: {{ todo.deadline | date: 'MM.dd.yyyy' }}</p>
-                          </ng-template>
-                          <ng-template [ngIf]="!todo.id || todoModel.id == todo.id">
-                            <div class="form-group">
-                              <label>Name</label>
-                              <input type="text" class="form-control" placeholder="Name" [(ngModel)]="todoModel.name">
-                            </div>
-                            <div class="form-group">
-                              <label>Deadline</label>
-                              <input type="date" class="form-control" [ngModel]="todoModel.deadline |date:'yyyy-MM-dd'"
-                                (ngModelChange)="todoModel.deadline = $event">
-                            </div>
-                            <div class="form-group">
-                              <label>Description</label>
-                              <textarea type="text" class="form-control" placeholder="Description"
-                                [(ngModel)]="todoModel.description"></textarea>
-                            </div>
-                            <div class="form-group">
-                              <button class="btn btn-primary pull-right" style="margin-left: 5px"
-                                (click)="saveTodoButtonClicked(todoModel)">Save</button>
-                              <button class="btn btn-danger pull-right" (click)="cancelButtonClicked(i)">Cancel</button>
-                            </div>
-                          </ng-template>
-                        </td>
-                        <td style="vertical-align: middle">{{ todo.status }}</td>
-                        <td style="vertical-align: middle">
-                          <ng-template [ngIf]="pageMode == 3">
-                            <div class="form-inline">
-                              <div class="form-group">
-                                <a style="margin-right: 5px; cursor: pointer" (click)="updateTodoButtonClicked(todo)">
-                                  <i class="fa fa-pencil" style="color: blue"></i>
-                                </a>
-                              </div>
-                              <div class="form-group">
-                                <a style="cursor: pointer" (click)="deleteTodoButtonClicked(i)">
-                                  <i class="fa fa-trash" style="color: red"></i>
-                                </a>
-                              </div>
-                            </div>
-                          </ng-template>
-                        </td>
+                    <ng-template
+                      [ngIf]="todoGroups && todoGroups.length > 0 && (!activeTodoGroup?.todos || activeTodoGroup?.todos?.length == 0)">
+                      <tr>
+                        <td colspan="4" style="text-align: center">There is no to do</td>
                       </tr>
                     </ng-template>
-                    <ng-template [ngIf]="pageMode == 3">
+                    <!-- <ng-template [ngIf]="activeTodoGroup?.todos?.length > 0"> -->
+                    <tr *ngFor="let todo of activeTodoGroup?.todos; let i=index">
+                      <td>
+                        <ng-template [ngIf]="todo.id && todoModel.id != todo.id">
+                          <h4>{{ todo.name }}</h4>
+                          <p>{{ todo.description }}</p>
+                          <p>Deadline: {{ todo.deadline | date: 'MM.dd.yyyy' }}</p>
+                        </ng-template>
+                        <ng-template [ngIf]="!todo.id || todoModel.id == todo.id">
+                          <div class="form-group">
+                            <label>Name</label>
+                            <input type="text" class="form-control" placeholder="Name" [(ngModel)]="todoModel.name">
+                          </div>
+                          <div class="form-group">
+                            <label>Deadline</label>
+                            <input type="date" class="form-control" [ngModel]="todoModel.deadline |date:'yyyy-MM-dd'"
+                              (ngModelChange)="todoModel.deadline = $event">
+                          </div>
+                          <div class="form-group">
+                            <label>Description</label>
+                            <textarea type="text" class="form-control" placeholder="Description"
+                              [(ngModel)]="todoModel.description"></textarea>
+                          </div>
+                          <div class="form-group">
+                            <button class="btn btn-primary pull-right" style="margin-left: 5px"
+                              (click)="saveTodoButtonClicked(todoModel)">Save</button>
+                            <button class="btn btn-danger pull-right" (click)="cancelButtonClicked(i)">Cancel</button>
+                          </div>
+                        </ng-template>
+                      </td>
+                      <td>
+                        <span *ngIf="todo.status == 1" class="badge badge-danger">{{ todo.statusText }}</span>
+                        <span *ngIf="todo.status == 2" class="badge badge-secondary">{{ todo.statusText }}</span>
+                        <span *ngIf="todo.status == 3" class="badge badge-success">{{ todo.statusText }}</span>
+                      </td>
+                      <td>
+                        <ng-template [ngIf]="todo.id && todoModel.id != todo.id">
+                          <ng-template [ngIf]="todo.status != 2">
+                            <div class="form-check">
+                              <label class="form-check-label">
+                                <input type="checkbox" class="form-check-input" [(ngModel)]="todo.isCompleted"
+                                  (ngModelChange)="statusChanged(todo,$event)">
+                                {{todo.isCompleted == true ? 'Mark as not completed' : 'Mark as completed'}}
+                              </label>
+                            </div>
+                          </ng-template>
+                        </ng-template>
+                      </td>
+                      <td>
+                        <ng-template [ngIf]="pageMode == 3 && todo.isCompleted != true">
+                          <div class="form-inline">
+                            <div class="form-group">
+                              <a style="margin-right: 5px; cursor: pointer" (click)="updateTodoButtonClicked(todo)">
+                                <i class="fa fa-pencil" style="color: blue"></i>
+                              </a>
+                            </div>
+                            <div class="form-group">
+                              <a style="cursor: pointer" (click)="deleteTodo(todo, i)">
+                                <i class="fa fa-trash" style="color: red"></i>
+                              </a>
+                            </div>
+                          </div>
+                        </ng-template>
+                      </td>
+                    </tr>
+                    <!-- </ng-template> -->
+                    <ng-template [ngIf]="pageMode == 3 && todoGroups?.length > 0">
                       <tr>
-                        <td colspan="3" style="text-align: center">
+                        <td colspan="4" style="text-align: center">
                           <a (click)="addTodoButtonClicked()" style="cursor: pointer"> <i class="fa fa-plus" style="font-size: 40px;
                           color: #37d8d8;
                           border: 1px solid #e8ebee;

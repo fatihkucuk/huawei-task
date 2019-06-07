@@ -10,6 +10,7 @@ import { ToDoListComponent } from './app/components/to-do-list/to-do-list.compon
 import { ContentComponent } from './app/components/content/content.component';
 import { LoginComponent } from './app/components/login/login.component';
 import { FormsModule } from '@angular/forms';
+import { HttpClientModule } from '@angular/common/http';
 
 @NgModule({
   declarations: [
@@ -24,7 +25,8 @@ import { FormsModule } from '@angular/forms';
     BrowserModule,
     AppRoutingModule,
     AngularFontAwesomeModule,
-    FormsModule
+    FormsModule,
+    HttpClientModule
   ],
   providers: [],
   bootstrap: [AppComponent]

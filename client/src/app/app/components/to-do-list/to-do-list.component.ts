@@ -12,7 +12,7 @@ import { TodoStatus } from '../../enums/todo-status-enum';
   selector: 'app-to-do-list',
   templateUrl: './to-do-list.component.html',
   styleUrls: ['./to-do-list.component.scss'],
-  providers: [TodoGroupRepository]
+  providers: [TodoGroupRepository, TodoRepository]
 })
 export class ToDoListComponent extends BaseComponent implements OnInit {
   pageMode: PageMode = PageMode.List;
@@ -24,53 +24,6 @@ export class ToDoListComponent extends BaseComponent implements OnInit {
   }
 
   ngOnInit() {
-    let todoGroup = new TodoGroupModel();
-    todoGroup.id = 1;
-    todoGroup.name = "School";
-
-    let todo = new TodoModel();
-    todo.id = 1;
-    todo.name = "Math Homework";
-    todo.description = "Math work book page 186-190 Math work book page 186-190 Math work book Math work book page 186-190 Math work book page 186-190 page 186-190 Math work book page 186-190";
-    todo.deadline = new Date();
-    todo.status = 0;
-    todoGroup.todos = new Array<TodoModel>();
-    todoGroup.todos.push(todo);
-
-    this.todoGroups.push(todoGroup);
-
-    todo = new TodoModel();
-    todo.id = 2;
-    todo.name = "Chemistry Homework";
-    todo.description = "Chemistry work book page 2-6";
-    todo.deadline = new Date();
-    todo.status = 1;
-    todoGroup.todos.push(todo);
-
-    this.todoGroups.push(todoGroup);
-
-    todoGroup = new TodoGroupModel();
-    todoGroup.id = 2;
-    todoGroup.name = "Work";
-
-    todo = new TodoModel();
-    todo.id = 2;
-    todo.name = "List-Detail Components";
-    todo.description = "Generate List-Detail Component with routing";
-    todo.deadline = new Date();
-    todo.status = 0;
-    todoGroup.todos = new Array<TodoModel>();
-    todoGroup.todos.push(todo);
-
-    this.todoGroups.push(todoGroup);
-
-    todoGroup = new TodoGroupModel();
-    todoGroup.id = 3;
-    todoGroup.name = "Social";
-    this.todoGroups.push(todoGroup);
-
-    this.activeTodoGroup = this.todoGroups[0];
-
     this.getTodoGroupsByUser();
   }
 
@@ -81,13 +34,22 @@ export class ToDoListComponent extends BaseComponent implements OnInit {
       return;
     }
     this.todoGroupRepo
-      .getByUser(this.userID, this.filter, this.sort)
+      .getByUser(this.userID)
       .then(res => {
-        if (res.hasError()) {
+        if (res.hasError) {
           this.hasError = true;
           this.errorMessage = res.getFirstErrorMessage();
         } else {
           this.todoGroups = res.entities;
+          if (this.todoGroups != undefined && this.todoGroups.length > 0) {
+            this.activeTodoGroup = this.todoGroups[0];
+            this.activeTodoGroup.copyTodos = this.activeTodoGroup.todos.slice();
+            this.copyTodos = this.activeTodoGroup.todos.slice();
+            this.todoGroup = this.activeTodoGroup;
+          }
+          this.selectedTabChanged(this.todoGroups[0]);
+          this.todoModel = new TodoModel();
+          this.pageMode = PageMode.List;
         }
       })
       .catch(err => {
@@ -102,10 +64,8 @@ export class ToDoListComponent extends BaseComponent implements OnInit {
     this.activeTodoGroup = todoGroup;
   }
 
-  activeTodoGroupClone: TodoGroupModel;
   groupNameChange(event: string) {
-    this.activeTodoGroupClone = this.activeTodoGroup;
-    this.activeTodoGroupClone.name = event;
+    this.activeTodoGroup.name = event;
   }
 
   saveTodoGroupButtonClicked() {
@@ -117,9 +77,6 @@ export class ToDoListComponent extends BaseComponent implements OnInit {
   }
 
   saveTodoButtonClicked() {
-    this.todoModel.groupID = this.activeTodoGroup.id;
-    //TODO: arrange todo.status on backend 
-    this.todoModel.name
     if (!this.todoModel.name) {
       this.errorMessage = "Name cannot be empty";
       return;
@@ -132,8 +89,48 @@ export class ToDoListComponent extends BaseComponent implements OnInit {
       this.errorMessage = "Deadline cannot be empty";
       return;
     }
+    this.todoModel.group_id = this.activeTodoGroup.id;
 
-    this.insertTodo();
+    if (this.pageMode == PageMode.Insert) {
+      this.insertTodo();
+    } else if (this.pageMode == PageMode.Update) {
+      this.updateTodo();
+    }
+  }
+
+  arrangeStatus(deadline: Date, status: number) {
+    let now = new Date();
+    deadline = new Date(deadline);
+    if (deadline.getTime() < now.getTime()) {
+      status = TodoStatus.Expired;
+    } else {
+      status = TodoStatus.NotCompleted;
+    }
+    return status;
+  }
+
+  insertTodo() {
+    this.todoModel.group_id = this.activeTodoGroup.id;
+    this.todoModel.id = undefined;
+    // if (!this.todoModel.status)
+    this.todoModel.status = this.arrangeStatus(this.todoModel.deadline, this.todoModel.status);
+
+    this.todoRepo
+      .post(this.todoModel)
+      .then(res => {
+        if (res.hasError) {
+          this.hasError = true;
+          this.errorMessage = res.getFirstErrorMessage();
+        } else {
+          this.todoModel = res.entity;
+          this.getTodoGroupsByUser();
+        }
+      })
+      .catch(err => {
+        this.hasError = true;
+        this.errorMessage =
+          "Bağlantı kurulurken bir hata oluştu. Lütfen tekrar deneyiniz.";
+      });
   }
 
   addTodoButtonClicked() {
@@ -153,17 +150,17 @@ export class ToDoListComponent extends BaseComponent implements OnInit {
   }
 
   insertTodoGroup() {
+    this.todoGroup.user_id = this.userID;
+    this.todoGroup.id = undefined;
     this.todoGroupRepo
       .post(this.todoGroup)
       .then(res => {
-        if (res.hasError()) {
+        if (res.hasError) {
           this.hasError = true;
           this.errorMessage = res.getFirstErrorMessage();
         } else {
           this.todoGroup = res.entity;
-          this.todoGroups.push(this.todoGroup);
-          this.activeTodoGroup = this.todoGroup;
-          this.pageMode = PageMode.List;
+          this.getTodoGroupsByUser();
         }
       })
       .catch(err => {
@@ -174,31 +171,49 @@ export class ToDoListComponent extends BaseComponent implements OnInit {
   }
 
   updateTodoGroupButtonClicked(activeTodoGroup: TodoGroupModel) {
-    activeTodoGroup = this.activeTodoGroupClone;
-    let found = this.todoGroups.find(todoGroup => todoGroup.id == activeTodoGroup.id);
-    found.id = activeTodoGroup.id;
-    found.name = activeTodoGroup.name;
-    found.todos = activeTodoGroup.todos.slice();
+    this.updateTodoGroup();
   }
 
-  deleteTodoGroupButtonClicked(activeTodoGroup: TodoGroupModel) {
-    let index = this.todoGroups.indexOf(activeTodoGroup);
-    if (index > -1) {
-      this.todoGroups.splice(index, 1);
-      this.activeTodoGroup = this.todoGroups.length > 0 ? this.todoGroups[0] : undefined;
-    }
-  }
-
-  insertTodo() {
-    this.todoRepo
-      .post(this.todoModel)
+  updateTodoGroup() {
+    this.todoGroup.user_id = this.userID;
+    this.todoGroup.name = this.activeTodoGroup.name;
+    this.todoGroup.id = this.activeTodoGroup.id;
+    this.todoGroupRepo
+      .put(this.todoGroup)
       .then(res => {
-        if (res.hasError()) {
+        if (res.hasError) {
           this.hasError = true;
           this.errorMessage = res.getFirstErrorMessage();
         } else {
-          this.todoModel = res.entity;
-          this.pageMode = PageMode.List;
+          this.todoGroup = res.entity;
+          this.getTodoGroupsByUser();
+        }
+      })
+      .catch(err => {
+        this.hasError = true;
+        this.errorMessage =
+          "Bağlantı kurulurken bir hata oluştu. Lütfen tekrar deneyiniz.";
+      });
+  }
+
+  deleteTodoGroupButtonClicked(activeTodoGroup: TodoGroupModel) {
+    this.deleteTodoGroup();
+  }
+
+  deleteTodoGroup() {
+    this.todoGroup.id = this.activeTodoGroup.id;
+    this.todoGroupRepo
+      .delete(this.todoGroup.id)
+      .then(res => {
+        if (res.hasError) {
+          this.hasError = true;
+          this.errorMessage = res.getFirstErrorMessage();
+        } else {
+          let index = this.todoGroups.indexOf(this.activeTodoGroup);
+          if (index > -1) {
+            this.todoGroups.splice(index, 1);
+            this.activeTodoGroup = this.todoGroups.length > 0 ? this.todoGroups[0] : undefined;
+          }
         }
       })
       .catch(err => {
@@ -213,7 +228,83 @@ export class ToDoListComponent extends BaseComponent implements OnInit {
     this.pageMode = PageMode.Update;
   }
 
-  deleteTodoButtonClicked(index: number) {
-    this.activeTodoGroup.todos.splice(index, 1);
+  updateTodo() {
+    this.todoModel.group_id = this.activeTodoGroup.id;
+    this.todoModel.status = this.arrangeStatus(this.todoModel.deadline, this.todoModel.status);
+
+    this.todoRepo
+      .put(this.todoModel)
+      .then(res => {
+        if (res.hasError) {
+          this.hasError = true;
+          this.errorMessage = res.getFirstErrorMessage();
+        } else {
+          this.todoModel = res.entity;
+          this.getTodoGroupsByUser();
+        }
+      })
+      .catch(err => {
+        this.hasError = true;
+        this.errorMessage =
+          "Bağlantı kurulurken bir hata oluştu. Lütfen tekrar deneyiniz.";
+      });
+  }
+
+  deleteTodo(todo: TodoModel, index: number) {
+    let ind = index;
+    this.todoRepo
+      .delete(todo.id)
+      .then(res => {
+        if (res.hasError) {
+          this.hasError = true;
+          this.errorMessage = res.getFirstErrorMessage();
+        } else {
+          this.activeTodoGroup.todos.splice(ind, 1);
+        }
+      })
+      .catch(err => {
+        this.hasError = true;
+        this.errorMessage =
+          "Bağlantı kurulurken bir hata oluştu. Lütfen tekrar deneyiniz.";
+      });
+  }
+
+  statusChanged(todo: TodoModel, event: boolean) {
+    todo.isCompleted = event;
+    if (event == true) {
+      todo.status = TodoStatus.Completed;
+    } else if (event == false) {
+      todo.status = TodoStatus.NotCompleted;
+    }
+    this.todoModel = todo;
+    this.updateTodo();
+  }
+
+  copyTodos: TodoModel[];
+  nameFilter: string;
+  statusFilter: string;
+  filterChanged(nameFilter: string = undefined, statusFilter: string = undefined) {
+    if (statusFilter == "undefined") {
+      statusFilter = undefined
+    }
+    let notFiltered = false;
+    this.activeTodoGroup.todos = this.copyTodos.filter(todo => {
+      if (nameFilter && !statusFilter)
+        return todo.name.toLowerCase().includes(nameFilter.toLowerCase())
+      else if (!nameFilter && statusFilter)
+        return todo.status == +statusFilter
+      else if (nameFilter && statusFilter)
+        return todo.name.toLowerCase().includes(nameFilter.toLowerCase()) && todo.status == +statusFilter
+      else if (!nameFilter && !statusFilter) {
+        notFiltered = true;
+        return this.copyTodos;
+      }
+    });
+    if (notFiltered)
+      this.activeTodoGroup.todos = this.copyTodos;
+    // let foundGroup = this.todoGroups.find(todoGroup => {
+    //   return todoGroup.id == this.activeTodoGroup.id;
+    // });
+    // foundGroup = this.activeTodoGroup;
   }
 }

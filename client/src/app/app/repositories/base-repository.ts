@@ -4,12 +4,14 @@ import { RepositoryConfig } from "./repository-config";
 
 import { SearchCriteria } from '../search-criteria';
 import { Dictionary } from '../helpers/dictionary';
-import { BaseModel } from '../models/base-model';
 import { LocalStorageHandler } from '../helpers/local-storage-handler';
 import { ResponseModel, NoParamConstructor } from '../models/response-model';
+import { TodoGroupModel } from '../models/todo-group-model';
+import { TodoModel } from '../models/todo-model';
+import { UserModel } from '../models/user-model';
 
 @Injectable()
-export class BaseRepository<T extends BaseModel> {
+export class BaseRepository<T> {
     public apiRoot = RepositoryConfig.baseURL;
 
     constructor(private ctor: NoParamConstructor<T>, public http: HttpClient = undefined, private apiPath: string = undefined) {
@@ -25,6 +27,24 @@ export class BaseRepository<T extends BaseModel> {
             .catch(this.handleError);
     }
 
+    genericPut(path: string, data: any) {
+        return this.http
+            .put(this.apiRoot + path, JSON.stringify(data), { headers: this.defaultHeaders() }).toPromise()
+            .then(res => {
+                return new ResponseModel<T>(this.ctor, res);
+            })
+            .catch(this.handleError);
+    }
+
+    genericDelete(path: string, data: any) {
+        return this.http
+            .delete(this.apiRoot + path).toPromise()
+            .then(res => {
+                return new ResponseModel<T>(this.ctor, res);
+            })
+            .catch(this.handleError);
+    }
+
     getAll(filter: SearchCriteria[] = undefined, sort: Dictionary = undefined) {
         var path = this.apiPath + '/list';
         var data = {}
@@ -33,18 +53,29 @@ export class BaseRepository<T extends BaseModel> {
     }
 
     post(item: T) {
-        var data = { entity: item.postDataRepresentation() };
+        let data = this.asPostDataRepresentation(item);
         return this.genericPost(this.apiPath + '/insert', data);
     }
 
+    asPostDataRepresentation(item: T) {
+        let data = {};
+        if (item instanceof TodoGroupModel)
+            data = item.postDataRepresentation();
+        else if (item instanceof TodoModel)
+            data = item.postDataRepresentation();
+        else if (item instanceof UserModel)
+            data = item.postDataRepresentation();
+
+        return data;
+    }
+
     put(item: T) {
-        var data = { entity: item.postDataRepresentation() };
-        return this.genericPost(this.apiPath + '/update', data);
+        let data = this.asPostDataRepresentation(item);
+        return this.genericPut(this.apiPath + '/update', data);
     }
 
     delete(id: number) {
-        var data = { Identifier: id }
-        return this.genericPost(this.apiPath + '/delete', data);
+        return this.genericDelete(this.apiPath + '/delete/' + id, undefined);
     }
 
     get(id: number) {

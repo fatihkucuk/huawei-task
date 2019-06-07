@@ -1,10 +1,10 @@
 <nav id="navbar-example2" class="navbar navbar-light bg-light">
   <a class="navbar-brand" href="#">Huawei Task</a>
-  <ul class="nav nav-pills">
+  <ul class="nav nav-pills" style="margin-right: 100px">
     <div class="dropdown">
       <button class="btn btn-basic dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown"
         aria-haspopup="true" aria-expanded="false">
-        {{user.userName}}
+        {{user.username}}
       </button>
       <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
         <a class="dropdown-item" [routerLink]="'/login'" (click)="logoutButtonClicked()">Logout</a>

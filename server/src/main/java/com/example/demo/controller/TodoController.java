@@ -60,8 +60,8 @@ public class TodoController {
         }
     }
 
-    @RequestMapping(value="/todos/update/{id}", method = RequestMethod.PUT)
-    public ResponseModel<Todo> updateTodo(@RequestBody Todo todo, @PathVariable("id") int id){
+    @RequestMapping(value="/todos/update", method = RequestMethod.PUT)
+    public ResponseModel<Todo> updateTodo(@RequestBody Todo todo){
         ResponseModel response = new ResponseModel<Todo>();
         try {
             todo = todoService.updateTodo(todo);

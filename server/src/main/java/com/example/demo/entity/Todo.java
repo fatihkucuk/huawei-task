@@ -41,12 +41,12 @@ public class Todo {
         this.deadline = deadline;
     }
 
-    public int getPassword() {
-        return password;
+    public int getStatus() {
+        return status;
     }
 
-    public void setPassword(int password) {
-        this.password = password;
+    public void setStatus(int status) {
+        this.status = status;
     }
 
     public int getGroup_id() {
@@ -96,7 +96,7 @@ public class Todo {
     private Date deadline;
 
     @Column(name="status")
-    private int password;
+    private int status;
 
     @Column(name="group_id")
     private int group_id;

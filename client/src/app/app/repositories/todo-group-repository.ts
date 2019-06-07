@@ -10,10 +10,9 @@ export class TodoGroupRepository extends BaseRepository<TodoGroupModel> {
 
     constructor(public http: HttpClient) { super(TodoGroupModel, http, 'todo-groups') }
 
-    getByUser(userID: number, filter: SearchCriteria[] = undefined, sort: Dictionary = undefined) {
-        var data = {}
-        this.applyCriteria(data, filter, sort);
-        return this.genericPost('users/' + userID + '/todo-groups', data);
+    getByUser(userID: number) {
+        var data = { user_id: userID }
+        return this.genericPost('/todo-groups/list', data);
     }
 
 }
