@@ -80,8 +80,7 @@ export class BaseRepository<T> {
 
     get(id: number) {
         var data = { Identifier: id }
-        this.applyCriteria(data, undefined, undefined);
-        return this.genericPost(this.apiPath + '/get', data);
+        return this.genericPost(this.apiPath + '/' + id, data);
     }
 
     handleError(error: any) {

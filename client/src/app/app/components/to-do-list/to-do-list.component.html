@@ -10,7 +10,8 @@
         <li style="position: absolute; right: 13px; top: 8px;">
           <div class="dropdown">
             <button class="btn btn-info btn-circle btn-sm dropdown-toggle" type="button" id="dropdownMenuButton"
-              data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="Add new to do list"
+              (click)="addTodoGroupButtonClicked()">
               <i class="fa fa-plus"></i>
             </button>
             <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
@@ -26,7 +27,7 @@
           <div class="dropdown">
             <ng-template [ngIf]="activeTodoGroup">
               <button class="btn btn-primary btn-circle btn-sm dropdown-toggle" type="button" id="dropdownMenuButton"
-                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="Edit list">
                 <i class="fa fa-pencil"></i>
               </button>
             </ng-template>
@@ -44,7 +45,8 @@
 
           <ng-template [ngIf]="activeTodoGroup">
             <button style="margin-left: 5px" type="button" class="btn btn-danger btn-circle btn-sm"
-              (click)="deleteTodoGroupButtonClicked(activeTodoGroup)"><i class="fa fa-trash"></i></button>
+              (click)="deleteTodoGroupButtonClicked(activeTodoGroup)"><i class="fa fa-trash"
+                title="Delete list"></i></button>
           </ng-template>
 
         </li>
@@ -155,12 +157,13 @@
                         <ng-template [ngIf]="pageMode == 3 && todo.isCompleted != true">
                           <div class="form-inline">
                             <div class="form-group">
-                              <a style="margin-right: 5px; cursor: pointer" (click)="updateTodoButtonClicked(todo)">
+                              <a style="margin-right: 5px; cursor: pointer" (click)="updateTodoButtonClicked(todo)"
+                                title="Edit to do">
                                 <i class="fa fa-pencil" style="color: blue"></i>
                               </a>
                             </div>
                             <div class="form-group">
-                              <a style="cursor: pointer" (click)="deleteTodo(todo, i)">
+                              <a style="cursor: pointer" (click)="deleteTodo(todo, i)" title="Delete to do">
                                 <i class="fa fa-trash" style="color: red"></i>
                               </a>
                             </div>
@@ -176,7 +179,7 @@
                           color: #37d8d8;
                           border: 1px solid #e8ebee;
                           border-radius: 55px;
-                          padding: 5px;"></i>
+                          padding: 5px;" title="Add new to do"></i>
                           </a>
                         </td>
                       </tr>

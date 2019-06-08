@@ -1,18 +1,17 @@
-<app-header></app-header>
-<!-- <div class="row"> -->
-<!-- <div class="col-md-2"> -->
-<!-- <app-left-side-bar></app-left-side-bar> -->
-<!-- </div> -->
-<!-- <div class="col-md-9"> -->
-<!-- <router-outlet></router-outlet> -->
-<!-- </div> -->
-<!-- </div> -->
+<ng-template [ngIf]="hasAuthorize == false">
+  <p class="text-center">You are not authorized</p>
+  <a class="text-center" style="display: block" [routerLink]="'/login'">Login/Signup</a>
+</ng-template>
 
-<div style="display: flex;   align-items: flex-start;">
-  <div style="flex: 0 1 0;">
-    <app-left-side-bar></app-left-side-bar>
+<ng-template [ngIf]="hasAuthorize == true">
+  <app-header></app-header>
+
+  <div style="display: flex;   align-items: flex-start;">
+    <div style="flex: 0 1 0;">
+      <app-left-side-bar></app-left-side-bar>
+    </div>
+    <div style="margin-left: 165px; flex: 2 1 0;">
+      <router-outlet></router-outlet>
+    </div>
   </div>
-  <div style="margin-left: 165px; flex: 2 1 0;">
-    <router-outlet></router-outlet>
-  </div>
-</div>
+</ng-template>

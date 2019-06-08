@@ -35,7 +35,7 @@ public class UserController {
         }
     }
 
-    @RequestMapping(value="/users/{id}", method = RequestMethod.GET)
+    @RequestMapping(value="/users/{id}", method = RequestMethod.POST)
     public ResponseModel<User> getUserById(@PathVariable("id") int id){
         ResponseModel response = new ResponseModel<User>();
         try {

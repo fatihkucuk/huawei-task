@@ -59,9 +59,14 @@ export class ToDoListComponent extends BaseComponent implements OnInit {
       });
   }
 
+  addTodoGroupButtonClicked() {
+    this.todoGroup = new TodoGroupModel();
+  }
+
   activeTodoGroup: TodoGroupModel;
   selectedTabChanged(todoGroup) {
     this.activeTodoGroup = todoGroup;
+    this.copyTodos = this.activeTodoGroup.todos;
   }
 
   groupNameChange(event: string) {
@@ -306,12 +311,37 @@ export class ToDoListComponent extends BaseComponent implements OnInit {
   }
 
   sortType: string;
-  sortStrategy: string;
   sortTypeChanged(sortType: string) {
-
-  }
-
-  sortStrategyChanged(sortStrategy: string) {
-
+    this.activeTodoGroup.todos = this.activeTodoGroup.todos.sort((a, b) => {
+      switch (sortType) {
+        case "undefined":
+          if (a.id < b.id)
+            return -1;
+        case "1":
+          let first = new Date(a.deadline);
+          let second = new Date(b.deadline);
+          return second.getTime() - first.getTime()
+        case "2":
+          first = new Date(a.deadline);
+          second = new Date(b.deadline);
+          return first.getTime() - second.getTime()
+        case "3":
+          if (a.name < b.name)
+            return -1
+        case "4":
+          if (a.name > b.name)
+            return -1
+        case "5":
+          if (a.status < b.status)
+            return -1
+          break;
+        case "6":
+          if (a.status > b.status)
+            return -1
+          break;
+        default:
+          break;
+      }
+    })
   }
 }
