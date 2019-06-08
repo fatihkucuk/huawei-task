@@ -228,9 +228,10 @@ export class ToDoListComponent extends BaseComponent implements OnInit {
     this.pageMode = PageMode.Update;
   }
 
-  updateTodo() {
+  updateTodo(arrangeStatus: boolean = true) {
     this.todoModel.group_id = this.activeTodoGroup.id;
-    this.todoModel.status = this.arrangeStatus(this.todoModel.deadline, this.todoModel.status);
+    if (arrangeStatus)
+      this.todoModel.status = this.arrangeStatus(this.todoModel.deadline, this.todoModel.status);
 
     this.todoRepo
       .put(this.todoModel)
@@ -277,7 +278,7 @@ export class ToDoListComponent extends BaseComponent implements OnInit {
       todo.status = TodoStatus.NotCompleted;
     }
     this.todoModel = todo;
-    this.updateTodo();
+    this.updateTodo(false);
   }
 
   copyTodos: TodoModel[];
@@ -302,9 +303,15 @@ export class ToDoListComponent extends BaseComponent implements OnInit {
     });
     if (notFiltered)
       this.activeTodoGroup.todos = this.copyTodos;
-    // let foundGroup = this.todoGroups.find(todoGroup => {
-    //   return todoGroup.id == this.activeTodoGroup.id;
-    // });
-    // foundGroup = this.activeTodoGroup;
+  }
+
+  sortType: string;
+  sortStrategy: string;
+  sortTypeChanged(sortType: string) {
+
+  }
+
+  sortStrategyChanged(sortStrategy: string) {
+
   }
 }

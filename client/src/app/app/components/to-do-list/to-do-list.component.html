@@ -53,18 +53,32 @@
         <hr>
         <div class="container" style="margin-top: 0 !important">
           <div class="row">
-            <div class="col-md-4">
-              <input type="text" class="form-control" placeholder="name filter" [(ngModel)]="nameFilter"
+            <div class="col-md-3">
+              <label for="">Filter by name</label>
+              <input type="text" class="form-control" placeholder="filter by name" [(ngModel)]="nameFilter"
                 (ngModelChange)="filterChanged($event, statusFilter)">
             </div>
-            <div class="col-md-4">
+            <div class="col-md-3">
+              <label for="">Filter by status</label>
               <select class="form-control" [(ngModel)]="statusFilter"
                 (ngModelChange)="filterChanged(nameFilter, $event)">
                 <option [value]="undefined" selected>Select</option>
                 <option [value]="1">Not Completed</option>
                 <option [value]="2">Expired</option>
                 <option [value]="3">Completed</option>
-
+              </select>
+            </div>
+            <div class="col-md-3"></div>
+            <div class="col-md-3 pull-right">
+              <label for="">Order by</label>
+              <select class="form-control" [(ngModel)]="sortType" (ngModelChange)="sortTypeChanged($event)">
+                <option [value]="undefined" selected>Select</option>
+                <option [value]="1">Deadline (Ascending)</option>
+                <option [value]="2">Deadline (Descending)</option>
+                <option [value]="3">Name (Ascending)</option>
+                <option [value]="4">Name (Descending)</option>
+                <option [value]="5">Status (Ascending)</option>
+                <option [value]="6">Status (Descending)</option>
               </select>
             </div>
           </div>
