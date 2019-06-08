@@ -7,6 +7,7 @@ import { TodoGroupRepository } from '../../repositories/todo-group-repository';
 import { LocalStorageHandler } from '../../helpers/local-storage-handler';
 import { TodoRepository } from '../../repositories/todo-repository';
 import { TodoStatus } from '../../enums/todo-status-enum';
+import { ToastrModule, ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-to-do-list',
@@ -19,7 +20,7 @@ export class ToDoListComponent extends BaseComponent implements OnInit {
   todoGroups = new Array<TodoGroupModel>();
   todoGroup = new TodoGroupModel();
   todoModel = new TodoModel();
-  constructor(private todoGroupRepo: TodoGroupRepository, private todoRepo: TodoRepository) {
+  constructor(private todoGroupRepo: TodoGroupRepository, private todoRepo: TodoRepository, private toastr: ToastrService) {
     super();
   }
 
@@ -43,14 +44,14 @@ export class ToDoListComponent extends BaseComponent implements OnInit {
           this.todoGroups = res.entities;
           if (this.todoGroups != undefined && this.todoGroups.length > 0) {
             this.todoGroups.map(todoGroup => {
-              todoGroup.copyTodos = todoGroup.todos.slice();
+              if (todoGroup.todos)
+                todoGroup.copyTodos = todoGroup.todos.slice();
             })
             this.activeTodoGroup = this.todoGroups[0];
             this.activeTodoGroup.copyTodos = this.activeTodoGroup.todos.slice();
-            // this.activeTodoGroup.copyTodos = this.activeTodoGroup.todos.slice();
-            this.todoGroup = this.activeTodoGroup;
+            this.todoGroup = this.activeTodoGroup.clone();
+            this.selectedTabChanged(this.todoGroups[0]);
           }
-          this.selectedTabChanged(this.todoGroups[0]);
           this.todoModel = new TodoModel();
           this.pageMode = PageMode.List;
         }
@@ -69,17 +70,16 @@ export class ToDoListComponent extends BaseComponent implements OnInit {
   activeTodoGroup: TodoGroupModel;
   selectedTabChanged(todoGroup) {
     this.activeTodoGroup = todoGroup;
-    // this.activeTodoGroup.copyTodos = this.activeTodoGroup.todos;
     this.nameFilter = undefined;
     this.statusFilter = undefined;
     this.sortType = undefined;
-    this.activeTodoGroup.todos = this.activeTodoGroup.copyTodos.slice();
+    if (this.activeTodoGroup && this.activeTodoGroup.copyTodos)
+      this.activeTodoGroup.todos = this.activeTodoGroup.copyTodos.slice();
 
   }
 
   cloneTodoGroup: TodoGroupModel;
   groupNameChange(todoGroup: TodoGroupModel, event: string) {
-    // this.activeTodoGroup.name = event;
     this.cloneTodoGroup = todoGroup.clone();
     this.cloneTodoGroup.name = event;
   }
@@ -87,6 +87,7 @@ export class ToDoListComponent extends BaseComponent implements OnInit {
   saveTodoGroupButtonClicked() {
     if (!this.todoGroup.name) {
       this.errorMessage = "List name cannot be empty";
+      this.toastr.error(this.errorMessage, 'WARNING!');
       return;
     }
     this.insertTodoGroup();
@@ -95,14 +96,17 @@ export class ToDoListComponent extends BaseComponent implements OnInit {
   saveTodoButtonClicked() {
     if (!this.todoModel.name) {
       this.errorMessage = "Name cannot be empty";
+      this.toastr.error(this.errorMessage, 'WARNING!');
       return;
     }
     if (!this.todoModel.description) {
       this.errorMessage = "Description cannot be empty";
+      this.toastr.error(this.errorMessage, 'WARNING!');
       return;
     }
     if (!this.todoModel.deadline) {
       this.errorMessage = "Deadline cannot be empty";
+      this.toastr.error(this.errorMessage, 'WARNING!');
       return;
     }
     this.todoModel.group_id = this.activeTodoGroup.id;
@@ -128,7 +132,6 @@ export class ToDoListComponent extends BaseComponent implements OnInit {
   insertTodo() {
     this.todoModel.group_id = this.activeTodoGroup.id;
     this.todoModel.id = undefined;
-    // if (!this.todoModel.status)
     this.todoModel.status = this.arrangeStatus(this.todoModel.deadline, this.todoModel.status);
 
     this.todoRepo
@@ -137,7 +140,9 @@ export class ToDoListComponent extends BaseComponent implements OnInit {
         if (res.hasError) {
           this.hasError = true;
           this.errorMessage = res.getFirstErrorMessage();
+          this.toastr.error(this.errorMessage, 'WARNING!');
         } else {
+          this.successMessage = "Operation completed successfully"
           this.todoModel = res.entity;
           this.getTodoGroupsByUser();
         }
@@ -150,6 +155,9 @@ export class ToDoListComponent extends BaseComponent implements OnInit {
   }
 
   addTodoButtonClicked() {
+    if (this.activeTodoGroup == undefined) {
+      this.activeTodoGroup = this.todoGroups[0];
+    }
     if (this.activeTodoGroup.todos == undefined) {
       this.activeTodoGroup.todos = new Array<TodoModel>();
     }
@@ -174,7 +182,9 @@ export class ToDoListComponent extends BaseComponent implements OnInit {
         if (res.hasError) {
           this.hasError = true;
           this.errorMessage = res.getFirstErrorMessage();
+          this.toastr.error(this.errorMessage, 'WARNING!');
         } else {
+          this.successMessage = "Operation completed successfully"
           this.todoGroup = res.entity;
           this.getTodoGroupsByUser();
         }
@@ -187,6 +197,11 @@ export class ToDoListComponent extends BaseComponent implements OnInit {
   }
 
   updateTodoGroupButtonClicked(activeTodoGroup: TodoGroupModel) {
+    if (!this.cloneTodoGroup || !this.cloneTodoGroup.name || !activeTodoGroup.name) {
+      this.errorMessage = "Name cannot be empty";
+      this.toastr.error(this.errorMessage, 'WARNING!');
+      return;
+    }
     activeTodoGroup.name = this.cloneTodoGroup.name;
     this.updateTodoGroup();
   }
@@ -201,7 +216,9 @@ export class ToDoListComponent extends BaseComponent implements OnInit {
         if (res.hasError) {
           this.hasError = true;
           this.errorMessage = res.getFirstErrorMessage();
+          this.toastr.error(this.errorMessage, 'WARNING!');
         } else {
+          this.successMessage = "Operation completed successfully"
           this.todoGroup = res.entity;
           this.getTodoGroupsByUser();
         }
@@ -225,7 +242,9 @@ export class ToDoListComponent extends BaseComponent implements OnInit {
         if (res.hasError) {
           this.hasError = true;
           this.errorMessage = res.getFirstErrorMessage();
+          this.toastr.error(this.errorMessage, 'WARNING!');
         } else {
+          this.successMessage = "Operation completed successfully"
           let index = this.todoGroups.indexOf(this.activeTodoGroup);
           if (index > -1) {
             this.todoGroups.splice(index, 1);
@@ -238,6 +257,8 @@ export class ToDoListComponent extends BaseComponent implements OnInit {
         this.errorMessage =
           "Bağlantı kurulurken bir hata oluştu. Lütfen tekrar deneyiniz.";
       });
+
+
   }
 
   updateTodoButtonClicked(todo) {
@@ -256,7 +277,10 @@ export class ToDoListComponent extends BaseComponent implements OnInit {
         if (res.hasError) {
           this.hasError = true;
           this.errorMessage = res.getFirstErrorMessage();
+          this.toastr.error(this.errorMessage, 'WARNING!');
+
         } else {
+          this.successMessage = "Operation completed successfully"
           this.todoModel = res.entity;
           this.getTodoGroupsByUser();
         }
@@ -276,7 +300,10 @@ export class ToDoListComponent extends BaseComponent implements OnInit {
         if (res.hasError) {
           this.hasError = true;
           this.errorMessage = res.getFirstErrorMessage();
+          this.toastr.error(this.errorMessage, 'WARNING!');
+
         } else {
+          this.successMessage = "Operation completed successfully"
           this.activeTodoGroup.todos.splice(ind, 1);
         }
       })

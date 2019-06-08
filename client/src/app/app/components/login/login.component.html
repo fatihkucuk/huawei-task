@@ -41,6 +41,11 @@
         <label>Password</label>
         <input type="password" class="form-control" [(ngModel)]="user.password" placeholder="Password">
       </div>
+      <div *ngIf="hasError == true" class="form-group">
+        <div class="alert alert-danger alert-dismissible fade show">
+          <strong>WARNING!</strong> {{errorMessage}}
+        </div>
+      </div>
       <div class="form-group">
         <ng-template [ngIf]="pageMode == 1">
           <a (click)="changePageMode(2)">Create an account</a>

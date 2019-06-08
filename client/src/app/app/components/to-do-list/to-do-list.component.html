@@ -27,7 +27,8 @@
           <div class="dropdown">
             <ng-template [ngIf]="activeTodoGroup">
               <button class="btn btn-primary btn-circle btn-sm dropdown-toggle" type="button" id="dropdownMenuButton"
-                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="Edit list">
+                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="Edit list"
+                (click)="cloneTodoGroup = todoGroup">
                 <i class="fa fa-pencil"></i>
               </button>
             </ng-template>
@@ -175,11 +176,8 @@
                     <ng-template [ngIf]="pageMode == 3 && todoGroups?.length > 0">
                       <tr>
                         <td colspan="4" style="text-align: center">
-                          <a (click)="addTodoButtonClicked()" style="cursor: pointer"> <i class="fa fa-plus" style="font-size: 40px;
-                          color: #37d8d8;
-                          border: 1px solid #e8ebee;
-                          border-radius: 55px;
-                          padding: 5px;" title="Add new to do"></i>
+                          <a (click)="addTodoButtonClicked()" style="cursor: pointer">
+                            <i class="fa fa-plus blue-add-button" title="Add new to do"></i>
                           </a>
                         </td>
                       </tr>

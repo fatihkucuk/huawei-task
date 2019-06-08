@@ -44,6 +44,14 @@ td {
   vertical-align: middle;
 }
 
-.fa-plus:hover {
+.blue-add-button {
+  font-size: 40px;
+  color: #37d8d8;
+  border: 1px solid #e8ebee;
+  border-radius: 55px;
+  padding: 10px;
+}
+
+.blue-add-button:hover {
   background-color: #e7edf2;
 }

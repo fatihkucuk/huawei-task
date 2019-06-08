@@ -3,6 +3,7 @@ import { LocalStorageHandler } from '../../helpers/local-storage-handler';
 import { UserRepository } from '../../repositories/user-repository';
 import { BaseComponent } from '../base-component';
 import { UserModel } from '../../models/user-model';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-content',

@@ -1,20 +1,12 @@
-import { Injector, Input } from '@angular/core';
-import { SearchCriteria } from '../search-criteria';
-import { Dictionary } from '../helpers/dictionary';
+import { ToastrService } from 'ngx-toastr';
 
 export class BaseComponent {
     postInProgress = false;
-
-    staticErrorMessage = ''
-    staticSuccessMessage = ''
 
     progressMessage = '';
     errorMessage = ''
     successMessage = '';
     hasError: boolean = false;
-
-    filter: SearchCriteria[];
-    sort: Dictionary;
 
     constructor() {
     }

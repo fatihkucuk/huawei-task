@@ -93,5 +93,7 @@ export class LoginComponent extends BaseComponent implements OnInit {
 
   changePageMode(pageMode: number) {
     this.pageMode = pageMode;
+    this.hasError = false;
+    this.errorMessage = "";
   }
 }
