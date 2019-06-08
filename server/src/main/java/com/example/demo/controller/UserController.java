@@ -54,7 +54,7 @@ public class UserController {
     public ResponseModel<User> login(@RequestBody User user){
         ResponseModel response = new ResponseModel<User>();
         try {
-            user.setToken(UUID.randomUUID().toString());
+//            user.setToken(UUID.randomUUID().toString());
 
             String encoded = encode(user.getPassword());
 
@@ -77,23 +77,22 @@ public class UserController {
         }
     }
 
-    private String encode(String password) throws NoSuchAlgorithmException {
-
-        MessageDigest md = MessageDigest.getInstance("MD5");
-        byte[] hashInBytes = md.digest(password.getBytes(StandardCharsets.UTF_8));
-
-        StringBuilder sb = new StringBuilder();
-        for (byte b : hashInBytes) {
-            sb.append(String.format("%02x", b));
-        }
-        String encoded = sb.toString();
-        return encoded;
-    }
-
     @RequestMapping(value="/users/signup", method = RequestMethod.POST)
     public ResponseModel<User> signup(@RequestBody User user){
         ResponseModel response = new ResponseModel<User>();
         try {
+
+            List<User> users = userService.getAllUsers();
+
+            for (User u : users) {
+                if(u.getUsername().equals(user.getUsername())){
+                    response.setHasError(true);
+                    response.setErrorMessage("This user name has already been taken");
+                    return response;
+                }
+            }
+
+            user.setToken(UUID.randomUUID().toString());
             String encoded = encode(user.getPassword());
             user.setPassword(encoded);
             user = userService.insertUser(user);
@@ -136,5 +135,18 @@ public class UserController {
             response.setErrorMessage(ex.getMessage());
             return response;
         }
+    }
+
+    private String encode(String password) throws NoSuchAlgorithmException {
+
+        MessageDigest md = MessageDigest.getInstance("MD5");
+        byte[] hashInBytes = md.digest(password.getBytes(StandardCharsets.UTF_8));
+
+        StringBuilder sb = new StringBuilder();
+        for (byte b : hashInBytes) {
+            sb.append(String.format("%02x", b));
+        }
+        String encoded = sb.toString();
+        return encoded;
     }
 }
