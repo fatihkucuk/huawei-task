@@ -42,9 +42,12 @@ export class ToDoListComponent extends BaseComponent implements OnInit {
         } else {
           this.todoGroups = res.entities;
           if (this.todoGroups != undefined && this.todoGroups.length > 0) {
+            this.todoGroups.map(todoGroup => {
+              todoGroup.copyTodos = todoGroup.todos.slice();
+            })
             this.activeTodoGroup = this.todoGroups[0];
             this.activeTodoGroup.copyTodos = this.activeTodoGroup.todos.slice();
-            this.copyTodos = this.activeTodoGroup.todos.slice();
+            // this.activeTodoGroup.copyTodos = this.activeTodoGroup.todos.slice();
             this.todoGroup = this.activeTodoGroup;
           }
           this.selectedTabChanged(this.todoGroups[0]);
@@ -66,11 +69,19 @@ export class ToDoListComponent extends BaseComponent implements OnInit {
   activeTodoGroup: TodoGroupModel;
   selectedTabChanged(todoGroup) {
     this.activeTodoGroup = todoGroup;
-    this.copyTodos = this.activeTodoGroup.todos;
+    // this.activeTodoGroup.copyTodos = this.activeTodoGroup.todos;
+    this.nameFilter = undefined;
+    this.statusFilter = undefined;
+    this.sortType = undefined;
+    this.activeTodoGroup.todos = this.activeTodoGroup.copyTodos.slice();
+
   }
 
-  groupNameChange(event: string) {
-    this.activeTodoGroup.name = event;
+  cloneTodoGroup: TodoGroupModel;
+  groupNameChange(todoGroup: TodoGroupModel, event: string) {
+    // this.activeTodoGroup.name = event;
+    this.cloneTodoGroup = todoGroup.clone();
+    this.cloneTodoGroup.name = event;
   }
 
   saveTodoGroupButtonClicked() {
@@ -176,6 +187,7 @@ export class ToDoListComponent extends BaseComponent implements OnInit {
   }
 
   updateTodoGroupButtonClicked(activeTodoGroup: TodoGroupModel) {
+    activeTodoGroup.name = this.cloneTodoGroup.name;
     this.updateTodoGroup();
   }
 
@@ -286,62 +298,66 @@ export class ToDoListComponent extends BaseComponent implements OnInit {
     this.updateTodo(false);
   }
 
-  copyTodos: TodoModel[];
+  // copyTodos: TodoModel[];
   nameFilter: string;
   statusFilter: string;
   filterChanged(nameFilter: string = undefined, statusFilter: string = undefined) {
-    if (statusFilter == "undefined") {
-      statusFilter = undefined
-    }
-    let notFiltered = false;
-    this.activeTodoGroup.todos = this.copyTodos.filter(todo => {
-      if (nameFilter && !statusFilter)
-        return todo.name.toLowerCase().includes(nameFilter.toLowerCase())
-      else if (!nameFilter && statusFilter)
-        return todo.status == +statusFilter
-      else if (nameFilter && statusFilter)
-        return todo.name.toLowerCase().includes(nameFilter.toLowerCase()) && todo.status == +statusFilter
-      else if (!nameFilter && !statusFilter) {
-        notFiltered = true;
-        return this.copyTodos;
+    if (this.activeTodoGroup.copyTodos != undefined && this.activeTodoGroup.copyTodos.length > 0) {
+      if (statusFilter == "undefined") {
+        statusFilter = undefined
       }
-    });
-    if (notFiltered)
-      this.activeTodoGroup.todos = this.copyTodos;
+      let notFiltered = false;
+      this.activeTodoGroup.todos = this.activeTodoGroup.copyTodos.filter(todo => {
+        if (nameFilter && !statusFilter)
+          return todo.name.toLowerCase().includes(nameFilter.toLowerCase())
+        else if (!nameFilter && statusFilter)
+          return todo.status == +statusFilter
+        else if (nameFilter && statusFilter)
+          return todo.name.toLowerCase().includes(nameFilter.toLowerCase()) && todo.status == +statusFilter
+        else if (!nameFilter && !statusFilter) {
+          notFiltered = true;
+          return this.activeTodoGroup.copyTodos;
+        }
+      });
+      if (notFiltered)
+        this.activeTodoGroup.todos = this.activeTodoGroup.copyTodos;
+    }
   }
 
   sortType: string;
   sortTypeChanged(sortType: string) {
-    this.activeTodoGroup.todos = this.activeTodoGroup.todos.sort((a, b) => {
-      switch (sortType) {
-        case "undefined":
-          if (a.id < b.id)
-            return -1;
-        case "1":
-          let first = new Date(a.deadline);
-          let second = new Date(b.deadline);
-          return second.getTime() - first.getTime()
-        case "2":
-          first = new Date(a.deadline);
-          second = new Date(b.deadline);
-          return first.getTime() - second.getTime()
-        case "3":
-          if (a.name < b.name)
-            return -1
-        case "4":
-          if (a.name > b.name)
-            return -1
-        case "5":
-          if (a.status < b.status)
-            return -1
-          break;
-        case "6":
-          if (a.status > b.status)
-            return -1
-          break;
-        default:
-          break;
-      }
-    })
+    if (this.activeTodoGroup && this.activeTodoGroup.todos && this.activeTodoGroup.todos.length > 0) {
+      this.activeTodoGroup.todos = this.activeTodoGroup.todos.sort((a, b) => {
+        switch (sortType) {
+          case "undefined":
+            if (a.id < b.id)
+              return -1;
+          case "1":
+            let first = new Date(a.deadline);
+            let second = new Date(b.deadline);
+            return second.getTime() - first.getTime()
+          case "2":
+            first = new Date(a.deadline);
+            second = new Date(b.deadline);
+            return first.getTime() - second.getTime()
+          case "3":
+            if (a.name < b.name)
+              return -1
+          case "4":
+            if (a.name > b.name)
+              return -1
+          case "5":
+            if (a.status < b.status)
+              return -1
+            break;
+          case "6":
+            if (a.status > b.status)
+              return -1
+            break;
+          default:
+            break;
+        }
+      })
+    }
   }
 }

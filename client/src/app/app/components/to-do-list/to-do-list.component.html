@@ -34,7 +34,7 @@
             <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
               <div class="dropdown-item" href="#">
                 <input type="text" class="form-control" placeholder="name" [ngModel]="activeTodoGroup?.name"
-                  (ngModelChange)="groupNameChange($event)">
+                  (ngModelChange)="groupNameChange(todoGroup, $event)">
               </div>
               <div class="dropdown-item" href="#">
                 <button class="btn btn-primary btn-sm pull-right"

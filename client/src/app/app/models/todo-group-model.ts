@@ -58,4 +58,15 @@ export class TodoGroupModel {
         item[TodoGroupModel.kUser_id] = this.user_id;
         return item;
     }
+
+    clone() {
+        let item = new TodoGroupModel();
+        item.id = this.id;
+        item.name = this.name;
+        item.user_id = this.user_id;
+        item.user = this.user;
+        if (this.todos)
+            item.todos = this.todos.slice();
+        return item;
+    }
 }
