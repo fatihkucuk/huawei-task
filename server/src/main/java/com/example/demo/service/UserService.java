@@ -1,12 +1,14 @@
 package com.example.demo.service;
 
 import com.example.demo.entity.User;
+import com.example.demo.model.ResponseModel;
+
 import java.util.List;
 
 public interface UserService {
-     User getUserById(int id);
-     List<User> getAllUsers();
-     User insertUser(User user);
-     User updateUser(User user);
-     void deleteUser(int id);
+     ResponseModel<User> getUserById(int id);
+     ResponseModel<User> getAllUsers();
+     ResponseModel<User> insertUser(User user);
+     ResponseModel<User> updateUser(User user);
+     ResponseModel<User> deleteUser(int id);
 }

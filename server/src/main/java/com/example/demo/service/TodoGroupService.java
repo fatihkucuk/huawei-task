@@ -2,13 +2,14 @@ package com.example.demo.service;
 
 
 import com.example.demo.entity.TodoGroup;
+import com.example.demo.model.ResponseModel;
 
 import java.util.List;
 
 public interface TodoGroupService {
-    TodoGroup getTodoGroupById(int id);
-    List<TodoGroup> getAllTodoGroups();
-    TodoGroup insertTodoGroup(TodoGroup todoGroup);
-    TodoGroup updateTodoGroup(TodoGroup todoGroup);
-    void deleteTodoGroup(int id);
+    ResponseModel<TodoGroup> getTodoGroupById(int id);
+    ResponseModel<TodoGroup> getAllTodoGroups();
+    ResponseModel<TodoGroup> insertTodoGroup(TodoGroup todoGroup);
+    ResponseModel<TodoGroup> updateTodoGroup(TodoGroup todoGroup);
+    ResponseModel<TodoGroup> deleteTodoGroup(int id);
 }

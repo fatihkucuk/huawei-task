@@ -1,4 +1,5 @@
 package com.example.demo.controller;
+
 import com.example.demo.entity.User;
 import com.example.demo.model.ResponseModel;
 import com.example.demo.service.UserService;
@@ -19,73 +20,53 @@ import java.util.UUID;
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 public class UserController {
 
-    @Autowired UserService userService;
-    @RequestMapping(value="/users/list",method = RequestMethod.GET)
-    public ResponseModel<User> getAllUsers(){
-        ResponseModel response = new ResponseModel<User>();
-        try {
-            List<User> users = userService.getAllUsers();
-            response.setEntities(users);
-            return response;
-        }
-        catch (Exception ex) {
-            response.setHasError(true);
-            response.setErrorMessage(ex.getMessage());
-            return response;
-        }
+    @Autowired
+    UserService userService;
+
+    @RequestMapping(value = "/users/list", method = RequestMethod.GET)
+    public ResponseModel<User> getAllUsers() {
+        ResponseModel<User> response = userService.getAllUsers();
+        return response;
     }
 
-    @RequestMapping(value="/users/{id}", method = RequestMethod.POST)
-    public ResponseModel<User> getUserById(@PathVariable("id") int id){
-        ResponseModel response = new ResponseModel<User>();
-        try {
-            User user = userService.getUserById(id);
-            response.setEntity(user);
-            return response;
-        }
-        catch (Exception ex) {
-            response.setHasError(true);
-            response.setErrorMessage(ex.getMessage());
-            return response;
-        }
+    @RequestMapping(value = "/users/{id}", method = RequestMethod.POST)
+    public ResponseModel<User> getUserById(@PathVariable("id") int id) {
+        ResponseModel<User> response = userService.getUserById(id);
+        return response;
     }
 
-    @RequestMapping(value="/users/login", method = RequestMethod.POST)
-    public ResponseModel<User> login(@RequestBody User user){
+    @RequestMapping(value = "/users/login", method = RequestMethod.POST)
+    public ResponseModel<User> login(@RequestBody User user) {
         ResponseModel response = new ResponseModel<User>();
         try {
-//            user.setToken(UUID.randomUUID().toString());
-
             String encoded = encode(user.getPassword());
-
-            List<User> users = userService.getAllUsers();
+            List<User> users = userService.getAllUsers().getEntities();
             for (User u : users) {
-                if(u.getUsername().equals(user.getUsername())  && u.getPassword().equals(encoded)){
+                if (u.getUsername().equals(user.getUsername()) && u.getPassword().equals(encoded)) {
                     response.setEntity(u);
                 }
             }
-            if(response.getEntity() == null){
+            if (response.getEntity() == null) {
                 response.setHasError(true);
                 response.setErrorMessage("Invalid username or password");
             }
             return response;
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             response.setHasError(true);
             response.setErrorMessage(ex.getMessage());
             return response;
         }
     }
 
-    @RequestMapping(value="/users/signup", method = RequestMethod.POST)
-    public ResponseModel<User> signup(@RequestBody User user){
+    @RequestMapping(value = "/users/signup", method = RequestMethod.POST)
+    public ResponseModel<User> signup(@RequestBody User user) {
         ResponseModel response = new ResponseModel<User>();
         try {
 
-            List<User> users = userService.getAllUsers();
+            List<User> users = userService.getAllUsers().getEntities();
 
             for (User u : users) {
-                if(u.getUsername().equals(user.getUsername())){
+                if (u.getUsername().equals(user.getUsername())) {
                     response.setHasError(true);
                     response.setErrorMessage("This user name has already been taken");
                     return response;
@@ -95,46 +76,26 @@ public class UserController {
             user.setToken(UUID.randomUUID().toString());
             String encoded = encode(user.getPassword());
             user.setPassword(encoded);
-            user = userService.insertUser(user);
+            user = userService.insertUser(user).getEntity();
             response.setEntity(user);
             return response;
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             response.setHasError(true);
             response.setErrorMessage(ex.getMessage());
             return response;
         }
     }
 
-    @RequestMapping(value="/users/update/{id}", method = RequestMethod.PUT)
-    public ResponseModel<User> updateUser(@RequestBody User user, @PathVariable("id") int id){
-        ResponseModel response = new ResponseModel<User>();
-        try {
-            user = userService.updateUser(user);
-            response.setEntity(user);
-            return response;
-        }
-        catch (Exception ex) {
-            response.setHasError(true);
-            response.setErrorMessage(ex.getMessage());
-            return response;
-        }
+    @RequestMapping(value = "/users/update/{id}", method = RequestMethod.PUT)
+    public ResponseModel<User> updateUser(@RequestBody User user, @PathVariable("id") int id) {
+        ResponseModel<User> response = userService.updateUser(user);
+        return response;
     }
 
-    @RequestMapping(value="/users/delete/{id}", method = RequestMethod.DELETE)
-    public ResponseModel<User> deleteUser(@PathVariable("id") int id){
-        ResponseModel response = new ResponseModel<User>();
-        try {
-            User user = userService.getUserById(id);
-            userService.deleteUser(id);
-            response.setEntity(user);
-            return response;
-        }
-        catch (Exception ex) {
-            response.setHasError(true);
-            response.setErrorMessage(ex.getMessage());
-            return response;
-        }
+    @RequestMapping(value = "/users/delete/{id}", method = RequestMethod.DELETE)
+    public ResponseModel<User> deleteUser(@PathVariable("id") int id) {
+        ResponseModel<User> response = userService.deleteUser(id);
+        return response;
     }
 
     private String encode(String password) throws NoSuchAlgorithmException {

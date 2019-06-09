@@ -19,7 +19,7 @@ public class ResponseModel<T> {
         this.entities = entities;
     }
 
-    public boolean isHasError() {
+    public boolean getHasError() {
         return hasError;
     }
 

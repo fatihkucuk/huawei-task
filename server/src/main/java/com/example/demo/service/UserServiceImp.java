@@ -1,6 +1,7 @@
 package com.example.demo.service;
 
 import com.example.demo.entity.User;
+import com.example.demo.model.ResponseModel;
 import com.example.demo.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,29 +15,78 @@ public class UserServiceImp implements UserService {
     UserRepository userRepository;
 
     @Override
-    public User getUserById(int id) {
-        Optional<User> userResponse = userRepository.findById(id);
-        User user = userResponse.get();
-        return user;
+    public ResponseModel<User> getUserById(int id) {
+        ResponseModel<User> response = new ResponseModel<User>();
+        try{
+            Optional<User> userResponse = userRepository.findById(id);
+            User user = userResponse.get();
+            response.setEntity(user);
+            return response;
+        }
+        catch (Exception ex){
+            response.setHasError(true);
+            response.setErrorMessage(ex.getMessage());
+            return response;
+        }
     }
 
     @Override
-    public List<User> getAllUsers() {
-        return userRepository.findAll();
+    public ResponseModel<User> getAllUsers() {
+        ResponseModel<User> response = new ResponseModel<User>();
+        try{
+            List<User> users = userRepository.findAll();
+            response.setEntities(users);
+            return response;
+        }
+        catch (Exception ex){
+            response.setHasError(true);
+            response.setErrorMessage(ex.getMessage());
+            return response;
+        }
     }
 
     @Override
-    public User insertUser(User user) {
-        return userRepository.save(user);
+    public ResponseModel<User> insertUser(User user) {
+        ResponseModel<User> response = new ResponseModel<User>();
+        try{
+            user = userRepository.save(user);
+            response.setEntity(user);
+            return response;
+        }
+        catch (Exception ex){
+            response.setHasError(true);
+            response.setErrorMessage(ex.getMessage());
+            return response;
+        }
     }
 
     @Override
-    public User updateUser(User user) {
-        return userRepository.save(user);
+    public ResponseModel<User> updateUser(User user) {
+        ResponseModel<User> response = new ResponseModel<User>();
+        try{
+            user = userRepository.save(user);
+            response.setEntity(user);
+            return response;
+        }
+        catch (Exception ex){
+            response.setHasError(true);
+            response.setErrorMessage(ex.getMessage());
+            return response;
+        }
     }
 
     @Override
-    public void deleteUser(int id) {
-        userRepository.deleteById(id);
+    public ResponseModel<User> deleteUser(int id) {
+        ResponseModel<User> response = new ResponseModel<User>();
+        try{
+            userRepository.deleteById(id);
+            response.setEntity(null);
+            return response;
+        }
+        catch (Exception ex){
+            response.setHasError(true);
+            response.setErrorMessage(ex.getMessage());
+            return response;
+        }
     }
 }

@@ -1,13 +1,14 @@
 package com.example.demo.service;
 
 import com.example.demo.entity.Todo;
+import com.example.demo.model.ResponseModel;
 
 import java.util.List;
 
 public interface TodoService {
-    Todo getTodoById(int id);
-    List<Todo> getAllTodos();
-    Todo insertTodo(Todo todo);
-    Todo updateTodo(Todo todo);
-    void deleteTodo(int id);
+    ResponseModel<Todo> getTodoById(int id);
+    ResponseModel<Todo> getAllTodos();
+    ResponseModel<Todo> insertTodo(Todo todo);
+    ResponseModel<Todo> updateTodo(Todo todo);
+    ResponseModel<Todo> deleteTodo(int id);
 }
