@@ -257,8 +257,6 @@ export class ToDoListComponent extends BaseComponent implements OnInit {
         this.errorMessage =
           "Bağlantı kurulurken bir hata oluştu. Lütfen tekrar deneyiniz.";
       });
-
-
   }
 
   updateTodoButtonClicked(todo) {
@@ -325,7 +323,6 @@ export class ToDoListComponent extends BaseComponent implements OnInit {
     this.updateTodo(false);
   }
 
-  // copyTodos: TodoModel[];
   nameFilter: string;
   statusFilter: string;
   filterChanged(nameFilter: string = undefined, statusFilter: string = undefined) {

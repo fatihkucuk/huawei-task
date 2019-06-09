@@ -15,6 +15,7 @@ export class UserModel {
     token: string;
     todoGroups: TodoGroupModel[];
 
+    passwordConfirm: string;
     constructor(element = undefined) {
 
         if (element)

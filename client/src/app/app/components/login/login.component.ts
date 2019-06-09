@@ -24,6 +24,16 @@ export class LoginComponent extends BaseComponent implements OnInit {
   }
 
   loginButtonClicked() {
+    if (!this.user.username) {
+      this.hasError = true;
+      this.errorMessage = "Username cannot be empty.";
+      return;
+    }
+    if (!this.user.password) {
+      this.hasError = true;
+      this.errorMessage = "Password cannot be empty.";
+      return;
+    }
     this.login();
   }
 
@@ -53,16 +63,29 @@ export class LoginComponent extends BaseComponent implements OnInit {
   }
 
   signupButtonClicked() {
+    if (!this.user.name) {
+      this.hasError = true;
+      this.errorMessage = "Name cannot be empty.";
+      return;
+    }
     if (!this.user.username) {
-      this.errorMessage = "Kullanıcı adı boş bırakılamaz.";
+      this.hasError = true;
+      this.errorMessage = "Username cannot be empty.";
       return;
     }
     if (!this.user.password) {
-      this.errorMessage = "Parola boş bırakılamaz.";
+      this.hasError = true;
+      this.errorMessage = "Password cannot be empty.";
       return;
     }
     if (this.user.password.length < 6) {
-      this.errorMessage = "Parola en az 6 karakterden oluşmalıdır.";
+      this.hasError = true;
+      this.errorMessage = "Password must be at least 6 characters";
+      return;
+    }
+    if (this.user.password != this.user.passwordConfirm) {
+      this.hasError = true;
+      this.errorMessage = "Passwords do not match";
       return;
     }
     this.signup();
