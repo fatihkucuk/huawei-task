@@ -42,7 +42,7 @@ public class TodoController {
 
     @RequestMapping(value = "/todos/delete/{id}", method = RequestMethod.DELETE)
     public ResponseModel<Todo> deleteTodo(@PathVariable("id") int id) {
-        ResponseModel<Todo> response = todoService.getTodoById(id);
+        ResponseModel<Todo> response = todoService.deleteTodo(id);
         return response;
     }
 }
