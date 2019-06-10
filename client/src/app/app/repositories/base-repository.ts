@@ -38,7 +38,7 @@ export class BaseRepository<T> {
 
     genericDelete(path: string, data: any) {
         return this.http
-            .delete(this.apiRoot + path).toPromise()
+            .delete(this.apiRoot + path, { headers: this.defaultHeaders() }).toPromise()
             .then(res => {
                 return new ResponseModel<T>(this.ctor, res);
             })
@@ -48,7 +48,6 @@ export class BaseRepository<T> {
     getAll(filter: SearchCriteria[] = undefined, sort: Dictionary = undefined) {
         var path = this.apiPath + '/list';
         var data = {}
-        this.applyCriteria(data, filter, sort);
         return this.genericPost(path, data);
     }
 

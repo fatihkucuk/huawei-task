@@ -8,6 +8,7 @@ import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -24,19 +25,26 @@ public class UserController {
     UserService userService;
 
     @RequestMapping(value = "/users/list", method = RequestMethod.GET)
-    public ResponseModel<User> getAllUsers() {
+    public ResponseModel<User> getAllUsers(HttpServletRequest request) {
+        boolean isAuthorized = isAuthorized(request);
+
+        if (isAuthorized == false) {
+            return getUnAuthorizedResponse();
+        }
+
         ResponseModel<User> response = userService.getAllUsers();
         return response;
     }
 
     @RequestMapping(value = "/users/{id}", method = RequestMethod.POST)
-    public ResponseModel<User> getUserById(@PathVariable("id") int id) {
+    public ResponseModel<User> getUserById(@PathVariable("id") int id, HttpServletRequest request) {
         ResponseModel<User> response = userService.getUserById(id);
         return response;
     }
 
     @RequestMapping(value = "/users/login", method = RequestMethod.POST)
-    public ResponseModel<User> login(@RequestBody User user) {
+    public ResponseModel<User> login(@RequestBody User user, HttpServletRequest request) {
+
         ResponseModel response = new ResponseModel<User>();
         try {
             String encoded = encode(user.getPassword());
@@ -59,7 +67,8 @@ public class UserController {
     }
 
     @RequestMapping(value = "/users/signup", method = RequestMethod.POST)
-    public ResponseModel<User> signup(@RequestBody User user) {
+    public ResponseModel<User> signup(@RequestBody User user, HttpServletRequest request) {
+
         ResponseModel response = new ResponseModel<User>();
         try {
 
@@ -87,13 +96,25 @@ public class UserController {
     }
 
     @RequestMapping(value = "/users/update/{id}", method = RequestMethod.PUT)
-    public ResponseModel<User> updateUser(@RequestBody User user, @PathVariable("id") int id) {
+    public ResponseModel<User> updateUser(@RequestBody User user, @PathVariable("id") int id, HttpServletRequest request) {
+        boolean isAuthorized = isAuthorized(request);
+
+        if (isAuthorized == false) {
+            return getUnAuthorizedResponse();
+        }
+
         ResponseModel<User> response = userService.updateUser(user);
         return response;
     }
 
     @RequestMapping(value = "/users/delete/{id}", method = RequestMethod.DELETE)
-    public ResponseModel<User> deleteUser(@PathVariable("id") int id) {
+    public ResponseModel<User> deleteUser(@PathVariable("id") int id, HttpServletRequest request) {
+        boolean isAuthorized = isAuthorized(request);
+
+        if (isAuthorized == false) {
+            return getUnAuthorizedResponse();
+        }
+
         ResponseModel<User> response = userService.deleteUser(id);
         return response;
     }
@@ -109,5 +130,27 @@ public class UserController {
         }
         String encoded = sb.toString();
         return encoded;
+    }
+
+    public boolean isAuthorized(HttpServletRequest request) {
+        String authorization = request.getHeader("Authorization");
+        String token = authorization.substring(7);
+
+        List<User> users = userService.getAllUsers().getEntities();
+        boolean loggedIn = false;
+
+        for (User user : users) {
+            if (token.equals(user.getToken())) {
+                loggedIn = true;
+            }
+        }
+        return loggedIn;
+    }
+
+    public ResponseModel getUnAuthorizedResponse() {
+        ResponseModel response = new ResponseModel();
+        response.setHasError(true);
+        response.setErrorMessage("You are not logged in");
+        return response;
     }
 }
